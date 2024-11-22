@@ -1,5 +1,5 @@
-"use client";   
-import React from "react";
+"use client";
+import React, { useEffect, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react"; // Import Swiper e SwiperSlide
 import { Navigation, Pagination, Autoplay } from "swiper/modules"; // Import dos módulos
 import "swiper/css"; // Estilos básicos do Swiper
@@ -7,6 +7,14 @@ import "swiper/css/navigation"; // Estilos do módulo de navegação
 import "swiper/css/pagination"; // Estilos do módulo de paginação
 import Image from "next/image";
 import { Typography, Button } from "@mui/material";
+import axios from "axios";
+
+type Product = {
+  id: number;
+  title: string;
+  description: string;
+  image: string;
+};
 
 type Banner = {
   id: number;
@@ -15,28 +23,28 @@ type Banner = {
   description: string;
 };
 
-const banners: Banner[] = [
-  {
-    id: 1,
-    image: "https://via.placeholder.com/1200x400?text=Banner+1",
-    title: "Banner 1",
-    description: "Descrição do primeiro banner.",
-  },
-  {
-    id: 2,
-    image: "https://via.placeholder.com/1200x400?text=Banner+2",
-    title: "Banner 2",
-    description: "Descrição do segundo banner.",
-  },
-  {
-    id: 3,
-    image: "https://via.placeholder.com/1200x400?text=Banner+3",
-    title: "Banner 3",
-    description: "Descrição do terceiro banner.",
-  },
-];
-
 const MainSlider: React.FC = () => {
+  const [banners, setBanners] = useState<Banner[]>([]);
+
+  useEffect(() => {
+    const fetchBanners = async () => {
+      try {
+        const response = await axios.get<Product[]>("https://fakestoreapi.com/products");
+        const data = response.data.map((item: Product) => ({
+          id: item.id,
+          image: item.image,
+          title: item.title,
+          description: item.description,
+        }));
+        setBanners(data.slice(0, 5)); // Limita a 5 banners
+      } catch (error) {
+        console.error("Erro ao buscar banners:", error);
+      }
+    };
+
+    fetchBanners();
+  }, []);
+
   return (
     <Swiper
       modules={[Navigation, Pagination, Autoplay]} // Módulos habilitados
@@ -44,8 +52,7 @@ const MainSlider: React.FC = () => {
       pagination={{ clickable: true }} // Paginador clicável
       autoplay={{ delay: 4000 }} // Transição automática
       loop // Loop infinito
-      style={{ width: "100%", height: "400px", marginTop: 80}} // Estilização do Swiper
-      
+      style={{ width: "100%", height: "400px", marginTop: 80 }} // Estilização do Swiper
     >
       {banners.map((banner) => (
         <SwiperSlide key={banner.id}>
@@ -54,7 +61,7 @@ const MainSlider: React.FC = () => {
               src={banner.image}
               alt={banner.title}
               layout="fill"
-              objectFit="cover"
+              objectFit="contain"
               priority
             />
             <div

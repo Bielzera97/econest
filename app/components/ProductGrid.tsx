@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 import { Card, CardContent, CardMedia, Typography, Rating, Button } from "@mui/material";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css"; // Importando os estilos do Swiper
@@ -8,51 +9,28 @@ import "swiper/css/navigation"; // Importando os estilos de navegação
 type Product = {
   id: number;
   image: string;
-  name: string;
+  title: string;
   price: number;
-  rating: number; // Avaliação do produto (por exemplo, de 0 a 5)
+  rating: { rate: number; count: number }; // Avaliação do produto
 };
 
-const products: Product[] = [
-  {
-    id: 1,
-    image: "https://via.placeholder.com/300x200?text=Produto+1",
-    name: "Produto 1",
-    price: 99.99,
-    rating: 4.5,
-  },
-  {
-    id: 2,
-    image: "https://via.placeholder.com/300x200?text=Produto+2",
-    name: "Produto 2",
-    price: 149.99,
-    rating: 4.0,
-  },
-  {
-    id: 3,
-    image: "https://via.placeholder.com/300x200?text=Produto+3",
-    name: "Produto 3",
-    price: 79.99,
-    rating: 4.2,
-  },
-  {
-    id: 4,
-    image: "https://via.placeholder.com/300x200?text=Produto+4",
-    name: "Produto 4",
-    price: 79.99,
-    rating: 4.2,
-  },
-  {
-    id: 5,
-    image: "https://via.placeholder.com/300x200?text=Produto+5",
-    name: "Produto 5",
-    price: 109.99,
-    rating: 3.5,
-  },
-  // Adicione mais produtos conforme necessário
-];
-
 const ProductGrid: React.FC = () => {
+  const [products, setProducts] = useState<Product[]>([]);
+
+  // Buscar produtos da API Fake Store
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await axios.get("https://fakestoreapi.com/products?limit=5");
+        setProducts(response.data);
+      } catch (error) {
+        console.error("Erro ao buscar produtos:", error);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
   return (
     <Swiper
       modules={[Navigation]} // Habilitando o módulo de navegação
@@ -64,26 +42,40 @@ const ProductGrid: React.FC = () => {
     >
       {products.map((product) => (
         <SwiperSlide key={product.id}>
-          <Card sx={{ maxWidth: "100%", width: "100%" }}>
+          <Card
+            sx={{
+              width: "100%",
+              height: "320px", // Altura fixa para uniformidade
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between",
+              boxSizing: "border-box",
+            }}
+          >
             <CardMedia
               component="img"
-              alt={product.name}
-              height="200"
+              alt={product.title}
+              sx={{ height: "150px", objectFit: "contain" }} // Imagem consistente
               image={product.image}
-              title={product.name}
+              title={product.title}
             />
             <CardContent>
-              <Typography variant="h6" component="div">
-                {product.name}
+              <Typography variant="h6" component="div" noWrap>
+                {product.title}
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 ${product.price.toFixed(2)}
               </Typography>
-              <Rating name="read-only" value={product.rating} readOnly precision={0.5} />
-              <Button variant="contained" color="primary" sx={{ mt: 2 }}>
-                Comprar
-              </Button>
+              <Rating
+                name="read-only"
+                value={product.rating.rate}
+                readOnly
+                precision={0.5}
+              />
             </CardContent>
+            <Button variant="contained" color="primary" sx={{ mt: 1 }}>
+              Comprar
+            </Button>
           </Card>
         </SwiperSlide>
       ))}
