@@ -1,6 +1,6 @@
 const Cart = () => {
     return(
-        <main>Cart page</main>
+        <main className="">Cart page</main>
     )
 }
 
