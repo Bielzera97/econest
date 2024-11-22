@@ -44,7 +44,8 @@ const MainSlider: React.FC = () => {
       pagination={{ clickable: true }} // Paginador clicável
       autoplay={{ delay: 4000 }} // Transição automática
       loop // Loop infinito
-      style={{ width: "100%", height: "400px" }} // Estilização do Swiper
+      style={{ width: "100%", height: "400px", marginTop: 80}} // Estilização do Swiper
+      
     >
       {banners.map((banner) => (
         <SwiperSlide key={banner.id}>

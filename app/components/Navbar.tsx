@@ -46,7 +46,7 @@ export default function Navbar() {
   const menuId = "account-menu";
 
   return (
-    <AppBar position="static" sx={{ backgroundColor: "white", color: "black", boxShadow: "none" }}>
+    <AppBar position="fixed" sx={{ backgroundColor: "white", color: "black", boxShadow: "none" }}>
       <Toolbar>
         {/* Logo placeholder */}
         <Box sx={{ width: 150, height: 50, backgroundColor: "grey.300", borderRadius: 1 }}></Box>
