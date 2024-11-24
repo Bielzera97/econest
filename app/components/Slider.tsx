@@ -80,7 +80,7 @@ const MainSlider: React.FC = () => {
               </Typography>
               <Typography variant="body1">{banner.description}</Typography>
               <Button variant="contained" color="primary" sx={{ mt: 2 }}>
-                Saiba Mais
+                <a href={`/product/${banner.id}`}>Saiba Mais</a>
               </Button>
             </div>
           </div>

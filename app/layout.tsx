@@ -1,21 +1,20 @@
-import type { Metadata } from "next";
-import Navbar from "./components/Navbar";
 import "./globals.scss";
 
-export const metadata: Metadata = {
+
+export const metadata = {
   title: "Econest",
+  description: "Melhor loja online para seus produtos favoritos",
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en">
       <body>
-        <Navbar/>
-        {children}
+          {children}
       </body>
     </html>
   );

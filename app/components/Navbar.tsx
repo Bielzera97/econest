@@ -3,6 +3,7 @@ import React from "react";
 import { AppBar, Toolbar, IconButton, InputBase, Box, Menu, MenuItem, Badge } from "@mui/material";
 import { MdSearch, MdFavoriteBorder, MdShoppingCart, MdAccountCircle } from "react-icons/md";
 import { styled } from "@mui/material/styles";
+import Link from "next/link";
 
 const StyledSearch = styled("div")(({ theme }) => ({
   position: "relative",
@@ -49,7 +50,7 @@ export default function Navbar() {
     <AppBar position="fixed" sx={{ backgroundColor: "white", color: "black", boxShadow: "none" }}>
       <Toolbar>
         {/* Logo placeholder */}
-        <Box sx={{ width: 150, height: 50, backgroundColor: "grey.300", borderRadius: 1 }}></Box>
+        <Box sx={{ width: 150, height: 50, backgroundColor: "grey.300", borderRadius: 1 }}><Link href={"/"}>Home</Link></Box>
 
         {/* Search bar */}
         <StyledSearch>

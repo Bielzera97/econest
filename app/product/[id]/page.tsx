@@ -11,6 +11,7 @@ import {
   Button,
 } from "@mui/material";
 import Image from "next/image";
+import Navbar from "@/app/components/Navbar";
 
 type Product = {
   id: number;
@@ -98,7 +99,9 @@ const ProductPage: React.FC = () => {
   }
 
   return (
-    <Box sx={{ padding: "20px", display: "flex", gap: "20px" }}>
+    <>
+    <Navbar/>
+    <Box sx={{ padding: "20px", display: "flex", gap: "20px", marginTop: "60px" }}>
       <Box sx={{ flex: 1 }}>
         <Image
           src={product.image}
@@ -129,6 +132,7 @@ const ProductPage: React.FC = () => {
         </Button>
       </Box>
     </Box>
+    </>
   );
 };
 
