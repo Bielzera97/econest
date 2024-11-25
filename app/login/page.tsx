@@ -2,6 +2,7 @@
 import { useState } from "react"
 import {auth} from "../../lib/firebaseConfig"
 import { signInWithEmailAndPassword } from "firebase/auth"
+import { useRouter } from "next/navigation"
 
 
 const Login = () => {
@@ -9,6 +10,7 @@ const Login = () => {
 
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
+    const router = useRouter()
     
     const handleSubmit = async (e : React.FormEvent) => {
         e.preventDefault()
@@ -17,6 +19,7 @@ const Login = () => {
         try{
             await signInWithEmailAndPassword(auth, email, password)
             alert("usuário logado com sucesso")
+            router.push('/')
         }
         catch(error){
             console.log(error + "Erro ao fazer login")

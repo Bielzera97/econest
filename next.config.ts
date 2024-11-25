@@ -2,7 +2,15 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
-    domains: ["via.placeholder.com","fakestoreapi.com"], // Adicione o domínio aqui
+    remotePatterns: [
+      {
+      hostname:"via.placeholder.com" 
+      },
+      {
+      hostname:"fakestoreapi.com"
+      }
+    
+    ], // Adicione o domínio aqui
   },
 };
 
