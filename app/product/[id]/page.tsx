@@ -2,14 +2,8 @@
 
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useParams } from "next/navigation"; // Importando useParams de next/navigation
-
-import {
-  Box,
-  Typography,
-  CircularProgress,
-  Button,
-} from "@mui/material";
+import { useParams } from "next/navigation";
+import { Box, Typography, CircularProgress, Button } from "@mui/material";
 import Image from "next/image";
 import Navbar from "@/app/components/Navbar";
 
@@ -38,7 +32,7 @@ const ProductPage: React.FC = () => {
           );
           setProduct(response.data);
         } catch (error) {
-          console.log(error)
+          console.error(error);
           setError("Erro ao buscar os detalhes do produto.");
         } finally {
           setLoading(false);
@@ -100,38 +94,51 @@ const ProductPage: React.FC = () => {
 
   return (
     <>
-    <Navbar/>
-    <Box sx={{ padding: "20px", display: "flex", gap: "20px", marginTop: "60px" }}>
-      <Box sx={{ flex: 1 }}>
-        <Image
-          src={product.image}
-          alt={product.title}
-          width={400}
-          height={400}
-          style={{ objectFit: "contain" }}
-        />
+      <Navbar />
+      <Box
+        sx={{
+          padding: "20px",
+          display: "flex",
+          gap: "20px",
+          flexDirection: { xs: "column", md: "row" }, // Responsividade
+          marginTop: "60px",
+        }}
+      >
+        <Box sx={{ flex: 1, display: "flex", justifyContent: "center" }}>
+          <Image
+            src={product.image}
+            alt={product.title}
+            width={400}
+            height={400}
+            style={{ objectFit: "contain" }}
+          />
+        </Box>
+        <Box sx={{ flex: 2 }}>
+          <Typography variant="h4" gutterBottom>
+            {product.title}
+          </Typography>
+          <Typography variant="h6" color="text.secondary" gutterBottom>
+            Categoria: {product.category}
+          </Typography>
+          <Typography variant="body1" paragraph>
+            {product.description}
+          </Typography>
+          <Typography variant="h5" color="primary" gutterBottom>
+            Preço: ${product.price.toFixed(2)}
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Avaliação: {product.rating.rate} ({product.rating.count} avaliações)
+          </Typography>
+          <Button
+            variant="contained"
+            color="primary"
+            sx={{ mt: 2 }}
+            disabled={loading}
+          >
+            {loading ? "Carregando..." : "Comprar Agora"}
+          </Button>
+        </Box>
       </Box>
-      <Box sx={{ flex: 2 }}>
-        <Typography variant="h4" gutterBottom>
-          {product.title}
-        </Typography>
-        <Typography variant="h6" color="text.secondary" gutterBottom>
-          Categoria: {product.category}
-        </Typography>
-        <Typography variant="body1" paragraph>
-          {product.description}
-        </Typography>
-        <Typography variant="h5" color="primary" gutterBottom>
-          Preço: ${product.price.toFixed(2)}
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          Avaliação: {product.rating.rate} ({product.rating.count} avaliações)
-        </Typography>
-        <Button variant="contained" color="primary" sx={{ mt: 2 }}>
-          Comprar Agora
-        </Button>
-      </Box>
-    </Box>
     </>
   );
 };

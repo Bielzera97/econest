@@ -1,12 +1,32 @@
 "use client";
-import React, { useEffect } from "react";
-import { AppBar, Toolbar, IconButton, InputBase, Box, Menu, MenuItem, Badge } from "@mui/material";
-import { MdSearch, MdFavoriteBorder, MdShoppingCart, MdAccountCircle } from "react-icons/md";
+import React, { useEffect, useState } from "react";
+import {
+  AppBar,
+  Toolbar,
+  IconButton,
+  InputBase,
+  Box,
+  Menu,
+  MenuItem,
+  Badge,
+  Drawer,
+  List,
+  ListItem,
+  ListItemText,
+  Switch,
+  CircularProgress,
+} from "@mui/material";
+import {
+  MdSearch,
+  MdFavoriteBorder,
+  MdShoppingCart,
+  MdAccountCircle,
+  MdMenu,
+} from "react-icons/md";
 import { styled } from "@mui/material/styles";
 import Link from "next/link";
-import {auth} from "../../lib/firebaseConfig"
+import { auth } from "../../lib/firebaseConfig";
 import { onAuthStateChanged, signOut } from "firebase/auth";
-import { useState } from "react";
 
 const StyledSearch = styled("div")(({ theme }) => ({
   position: "relative",
@@ -16,7 +36,7 @@ const StyledSearch = styled("div")(({ theme }) => ({
     backgroundColor: theme.palette.grey[300],
   },
   marginRight: theme.spacing(2),
-  marginLeft: theme.spacing(10),
+  marginLeft: theme.spacing(2),
   width: "100%",
   [theme.breakpoints.up("sm")]: {
     width: "auto",
@@ -35,11 +55,14 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-
 export default function Navbar() {
   const [userID, setUserId] = useState("");
   const [displayName, setDisplayName] = useState("");
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [darkMode, setDarkMode] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
   const isMenuOpen = Boolean(anchorEl);
 
   const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -50,40 +73,70 @@ export default function Navbar() {
     setAnchorEl(null);
   };
 
-  const menuId = "account-menu";
+  const toggleDarkMode = () => setDarkMode((prev) => !prev);
 
+  const handleDrawerToggle = () => setDrawerOpen(!drawerOpen);
+
+  const handleLogout = async () => {
+    setIsLoading(true);
+    try {
+      await signOut(auth);
+      console.log("Usuário deslogado com sucesso");
+    } catch (error) {
+      console.error("Erro ao deslogar:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         setUserId(user.uid || "id");
         setDisplayName(user.displayName || "Usuário");
-        
       } else {
-        setDisplayName("")
+        setDisplayName("");
       }
     });
-
-    console.log(userID)
     return () => unsubscribe();
   }, []);
 
-  const handleLogout = async () => {
-    try {
-      await signOut(auth);
-      console.log("Usuário deslogado com sucesso");
-    } catch (error) {
-      console.error("Erro ao deslogar:", error);
-    }
-  };
+  console.log(userID)
 
   return (
-    <AppBar position="fixed" sx={{ backgroundColor: "white", color: "black", boxShadow: "none" }}>
+    <AppBar
+      position="fixed"
+      sx={{
+        backgroundColor: darkMode ? "black" : "white",
+        color: darkMode ? "white" : "black",
+        boxShadow: "none",
+      }}
+    >
       <Toolbar>
-        {/* Logo placeholder */}
-        <Box sx={{ width: 150, height: 50, backgroundColor: "grey.300", borderRadius: 1 }}><Link href={"/"}>Home</Link></Box>
+        {/* Botão para menu em dispositivos menores */}
+        <IconButton
+          color="inherit"
+          edge="start"
+          onClick={handleDrawerToggle}
+          sx={{ display: { sm: "none" } }}
+        >
+          <MdMenu />
+        </IconButton>
 
-        {/* Search bar */}
+        {/* Logo */}
+        <Box
+          sx={{
+            width: 150,
+            height: 50,
+            backgroundColor: darkMode ? "grey.800" : "grey.300",
+            borderRadius: 1,
+            display: { xs: "none", sm: "block" },
+          }}
+        >
+          <Link href="/">Home</Link>
+        </Box>
+
+        {/* Barra de busca */}
         <StyledSearch>
           <StyledInputBase
             placeholder="Buscar…"
@@ -96,82 +149,76 @@ export default function Navbar() {
 
         <Box sx={{ flexGrow: 1 }} />
 
-        {/* Favorites button */}
+        {/* Botão de favoritos */}
         <IconButton color="inherit" size="large">
           <Badge badgeContent={0} color="error">
             <MdFavoriteBorder />
           </Badge>
         </IconButton>
 
-        {/* Cart button */}
+        {/* Botão de carrinho */}
         <IconButton color="inherit" size="large">
           <Badge badgeContent={0} color="error">
             <MdShoppingCart />
           </Badge>
         </IconButton>
 
-        {displayName ? <IconButton
-          edge="end"
-          aria-label="account of current user"
-          aria-controls={menuId}
-          aria-haspopup="true"
-          onClick={handleProfileMenuOpen}
-          color="inherit"
-        >
-          <MdAccountCircle />
-          <p>{displayName}</p>
-          <Menu
+        {/* Alternar dark mode */}
+        <Switch checked={darkMode} onChange={toggleDarkMode} />
+
+        {/* Menu do usuário */}
+        {displayName ? (
+          <IconButton
+            edge="end"
+            aria-label="account of current user"
+            aria-controls="account-menu"
+            aria-haspopup="true"
+            onClick={handleProfileMenuOpen}
+            color="inherit"
+          >
+            <MdAccountCircle />
+            <p>{displayName}</p>
+          </IconButton>
+        ) : (
+          <Link href="/login">
+            <IconButton color="inherit">
+              <MdAccountCircle />
+            </IconButton>
+          </Link>
+        )}
+
+        {/* Menu dropdown */}
+        <Menu
           anchorEl={anchorEl}
+          open={isMenuOpen}
+          onClose={handleMenuClose}
           anchorOrigin={{
             vertical: "top",
             horizontal: "right",
           }}
-          id={menuId}
-          keepMounted
-          transformOrigin={{
-            vertical: "top",
-            horizontal: "right",
-          }}
-          open={isMenuOpen}
-          onClose={handleMenuClose}
         >
           <MenuItem onClick={handleMenuClose}>Minha Conta</MenuItem>
           <MenuItem onClick={handleMenuClose}>Meus Pedidos</MenuItem>
-          <MenuItem onClick={handleLogout}>Sair</MenuItem>
+          <MenuItem onClick={handleLogout}>
+            {isLoading ? <CircularProgress size={20} /> : "Sair"}
+          </MenuItem>
         </Menu>
-        </IconButton>
-         :
-         <IconButton
-          edge="end"
-          aria-label="account of current user"
-          aria-controls={menuId}
-          aria-haspopup="true"
-          onClick={handleProfileMenuOpen}
-          color="inherit"
-        >
-          <MdAccountCircle />
-          <Menu
-          anchorEl={anchorEl}
-          anchorOrigin={{
-            vertical: "top",
-            horizontal: "right",
-          }}
-          id={menuId}
-          keepMounted
-          transformOrigin={{
-            vertical: "top",
-            horizontal: "right",
-          }}
-          open={isMenuOpen}
-          onClose={handleMenuClose}
-        >
-          <MenuItem><Link href={'/login'}>Login</Link></MenuItem>
-          <MenuItem><Link href={'/register'}>Register</Link></MenuItem>
-        </Menu>
-        </IconButton>}
-
-
       </Toolbar>
+
+      {/* Drawer para dispositivos menores */}
+      <Drawer open={drawerOpen} onClose={handleDrawerToggle}>
+        <List>
+          <ListItem  onClick={handleDrawerToggle}>
+            <ListItemText primary="Home" />
+          </ListItem>
+          <ListItem  onClick={handleDrawerToggle}>
+            <ListItemText primary="Favoritos" />
+          </ListItem>
+          <ListItem onClick={handleDrawerToggle}>
+            <ListItemText primary="Carrinho" />
+          </ListItem>
+        </List>
+      </Drawer>
     </AppBar>
   );
 }
