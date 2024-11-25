@@ -1,5 +1,5 @@
 import "./globals.scss";
-
+import Providers from './providers';
 
 export const metadata = {
   title: "Econest",
@@ -14,7 +14,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
+        <Providers>
           {children}
+        </Providers>  
       </body>
     </html>
   );

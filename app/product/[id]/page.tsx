@@ -3,9 +3,17 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams } from "next/navigation";
-import { Box, Typography, CircularProgress, Button } from "@mui/material";
+
+import {
+  Box,
+  Typography,
+  CircularProgress,
+  Button,
+} from "@mui/material";
 import Image from "next/image";
 import Navbar from "@/app/components/Navbar";
+import { useDispatch } from "react-redux";
+import { addItem } from "../../features/cartSlice"; // Importando a ação do cartSlice
 
 type Product = {
   id: number;
@@ -18,10 +26,12 @@ type Product = {
 };
 
 const ProductPage: React.FC = () => {
-  const { id } = useParams(); // Usando useParams para acessar o id da URL
+  const { id } = useParams();
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
+
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (id) {
@@ -32,7 +42,7 @@ const ProductPage: React.FC = () => {
           );
           setProduct(response.data);
         } catch (error) {
-          console.error(error);
+          console.log(error);
           setError("Erro ao buscar os detalhes do produto.");
         } finally {
           setLoading(false);
@@ -92,19 +102,26 @@ const ProductPage: React.FC = () => {
     );
   }
 
+  const handleAddToCart = () => {
+    if (product) {
+      dispatch(
+        addItem({
+          id: product.id,
+          title: product.title,
+          image: product.image,
+          price: product.price,
+          quantity: 1,
+        })
+      );
+    }
+    console.log(product, 'add no carrinho')
+  };
+
   return (
     <>
       <Navbar />
-      <Box
-        sx={{
-          padding: "20px",
-          display: "flex",
-          gap: "20px",
-          flexDirection: { xs: "column", md: "row" }, // Responsividade
-          marginTop: "60px",
-        }}
-      >
-        <Box sx={{ flex: 1, display: "flex", justifyContent: "center" }}>
+      <Box sx={{ padding: "20px", display: "flex", gap: "20px", marginTop: "60px" }}>
+        <Box sx={{ flex: 1 }}>
           <Image
             src={product.image}
             alt={product.title}
@@ -133,9 +150,9 @@ const ProductPage: React.FC = () => {
             variant="contained"
             color="primary"
             sx={{ mt: 2 }}
-            disabled={loading}
+            onClick={handleAddToCart}
           >
-            {loading ? "Carregando..." : "Comprar Agora"}
+            Adicionar ao Carrinho
           </Button>
         </Box>
       </Box>

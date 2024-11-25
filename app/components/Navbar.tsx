@@ -27,6 +27,8 @@ import { styled } from "@mui/material/styles";
 import Link from "next/link";
 import { auth } from "../../lib/firebaseConfig";
 import { onAuthStateChanged, signOut } from "firebase/auth";
+import { useSelector } from "react-redux";
+import { RootState } from "@/app/store";
 
 const StyledSearch = styled("div")(({ theme }) => ({
   position: "relative",
@@ -63,6 +65,11 @@ export default function Navbar() {
   const [isLoading, setIsLoading] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
 
+  const cartItemsCount = useSelector((state: RootState) =>
+    state.cart.items.reduce((total, item) => total + item.quantity, 0)
+  );
+
+  console.log(userID)
   const isMenuOpen = Boolean(anchorEl);
 
   const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -101,8 +108,6 @@ export default function Navbar() {
     return () => unsubscribe();
   }, []);
 
-  console.log(userID)
-
   return (
     <AppBar
       position="fixed"
@@ -113,7 +118,6 @@ export default function Navbar() {
       }}
     >
       <Toolbar>
-        {/* Botão para menu em dispositivos menores */}
         <IconButton
           color="inherit"
           edge="start"
@@ -123,7 +127,6 @@ export default function Navbar() {
           <MdMenu />
         </IconButton>
 
-        {/* Logo */}
         <Box
           sx={{
             width: 150,
@@ -136,7 +139,6 @@ export default function Navbar() {
           <Link href="/">Home</Link>
         </Box>
 
-        {/* Barra de busca */}
         <StyledSearch>
           <StyledInputBase
             placeholder="Buscar…"
@@ -149,24 +151,22 @@ export default function Navbar() {
 
         <Box sx={{ flexGrow: 1 }} />
 
-        {/* Botão de favoritos */}
         <IconButton color="inherit" size="large">
           <Badge badgeContent={0} color="error">
             <MdFavoriteBorder />
           </Badge>
         </IconButton>
 
-        {/* Botão de carrinho */}
         <IconButton color="inherit" size="large">
-          <Badge badgeContent={0} color="error">
+          <Link href={'/cart'}>
+          <Badge badgeContent={cartItemsCount} color="error">
             <MdShoppingCart />
           </Badge>
+          </Link>
         </IconButton>
 
-        {/* Alternar dark mode */}
         <Switch checked={darkMode} onChange={toggleDarkMode} />
 
-        {/* Menu do usuário */}
         {displayName ? (
           <IconButton
             edge="end"
@@ -187,7 +187,6 @@ export default function Navbar() {
           </Link>
         )}
 
-        {/* Menu dropdown */}
         <Menu
           anchorEl={anchorEl}
           open={isMenuOpen}
@@ -205,13 +204,12 @@ export default function Navbar() {
         </Menu>
       </Toolbar>
 
-      {/* Drawer para dispositivos menores */}
       <Drawer open={drawerOpen} onClose={handleDrawerToggle}>
         <List>
-          <ListItem  onClick={handleDrawerToggle}>
+          <ListItem onClick={handleDrawerToggle}>
             <ListItemText primary="Home" />
           </ListItem>
-          <ListItem  onClick={handleDrawerToggle}>
+          <ListItem onClick={handleDrawerToggle}>
             <ListItemText primary="Favoritos" />
           </ListItem>
           <ListItem onClick={handleDrawerToggle}>
